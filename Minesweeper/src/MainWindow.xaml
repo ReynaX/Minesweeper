@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Minesweeper"
         mc:Ignorable="d"
         Title="MainWindow" Height="191" Width="180">
-    <UniformGrid x:Name="grid" Margin="0,0,0,0" Height="Auto" Width="Auto">
-    </UniformGrid>
+    <Grid x:Name="grid" Margin="0,0,0,0" Height="Auto" Width="Auto">
+    </Grid>
 
 </Window>
