@@ -26,7 +26,11 @@ namespace Minesweeper
         public bool IsMarked { get; set; }
 
         private readonly StackPanel panel;
-
+        /// <summary>
+        /// Clear current content of a button and stores a new given one.
+        /// </summary>
+        /// <typeparam name="T">Type of UIElement that can be stored inside a button(Textblock or image).</typeparam>
+        /// <param name="content">Element to be stored inside a button.</param>
         public void SetContent<T>(T content) where T:UIElement
         {
             panel.Children.Clear();
