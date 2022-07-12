@@ -109,5 +109,9 @@
   <ItemGroup>
     <Resource Include="Resources\flag_icon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\happy_emoji_icon.png" />
+    <Resource Include="Resources\sad_emoji_icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

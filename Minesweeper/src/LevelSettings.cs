@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Minesweeper
 {
@@ -11,7 +7,7 @@ namespace Minesweeper
         public enum Difficulty : uint { Beginner = 0, Intermediate, Expert };
 
         private static Dictionary<Difficulty, Settings> levelSettings;
-        private static bool areLevelSettingsLoaded = false;
+        private static bool areLevelSettingsLoaded;
 
         public static Settings GetLevelSettings(Difficulty difficulty)
         {

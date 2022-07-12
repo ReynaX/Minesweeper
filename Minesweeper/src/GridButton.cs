@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-
 namespace Minesweeper
 {
     class GridButton : Button
@@ -20,7 +14,6 @@ namespace Minesweeper
             Col = col;
             Content = panel;
         }
-
         public int Row { get; private set; }
         public int Col { get; private set; }
         public bool IsMarked { get; set; }
@@ -36,5 +29,6 @@ namespace Minesweeper
             panel.Children.Clear();
             panel.Children.Add(content);
         }
+
     }
 }
