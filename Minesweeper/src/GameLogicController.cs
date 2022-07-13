@@ -9,7 +9,25 @@ namespace Minesweeper
 {
     public sealed class GameLogicController
     {
+        public enum Action
+        {
+            Mark,
+            Unmark,
+            Reveal,
+            RevealNeighbors
+        }
+
         private static GameLogicController instance;
+
+        // Stores buttons from the grid
+        private readonly List<GridButton> buttons;
+
+        private GameLogicController(LevelSettings.Difficulty difficulty)
+        {
+            Difficulty = difficulty;
+            buttons = new List<GridButton>(TilesRemaining);
+            IsFirstMove = true;
+        }
 
         public static GameLogicController Instance
         {
@@ -21,10 +39,7 @@ namespace Minesweeper
             }
         }
 
-        public enum Action { Mark, Unmark, Reveal, RevealNeighbors };
-
-        public LevelSettings.Difficulty Difficulty { get;  private set; }
-        private readonly List<GridButton> buttons;
+        public LevelSettings.Difficulty Difficulty { get; private set; }
 
         public bool IsGameLost { get; private set; }
         public bool IsGameWon { get; private set; }
@@ -32,17 +47,10 @@ namespace Minesweeper
         public int TilesRemaining { get; private set; }
         public int MinesMarked { get; private set; }
 
-        private int[,] BoardValues { get;  set; }
-
-        private GameLogicController(LevelSettings.Difficulty difficulty)
-        {
-            Difficulty = difficulty;
-            buttons = new List<GridButton>(TilesRemaining);
-            IsFirstMove = true;
-        }
+        private int[,] BoardValues { get; set; }
 
         /// <summary>
-        /// Start a new game with given difficulty. Button in given row and column will have a value 0.
+        ///     Start a new game with given difficulty. Button in given row and column will have a value 0.
         /// </summary>
         /// <param name="rowClicked"> row of a button that has been clicked by a user </param>
         /// <param name="colClicked"> col of a button that has been clicked by a user </param>
@@ -89,13 +97,13 @@ namespace Minesweeper
                     break;
             }
 
-            if (TilesRemaining - MinesMarked == 0 && 
+            if (TilesRemaining - MinesMarked == 0 &&
                 MinesMarked == LevelSettings.GetLevelSettings(Difficulty).Mines)
                 IsGameWon = true;
         }
 
         /// <summary>
-        /// Mark given button, change its content and update number of mines marked
+        ///     Mark given button, change its content and update number of mines marked
         /// </summary>
         private void MarkSquare(GridButton button)
         {
@@ -110,7 +118,7 @@ namespace Minesweeper
         }
 
         /// <summary>
-        /// Unmark given button, change its content and update number of mines marked
+        ///     Unmark given button, change its content and update number of mines marked
         /// </summary>
         private void UnmarkSquare(GridButton button)
         {
@@ -119,6 +127,10 @@ namespace Minesweeper
             button.SetContent(new UIElement());
         }
 
+        /// <summary>
+        ///     Called whenever already revealed button was clicked.
+        /// </summary>
+        /// <param name="buttonClicked"></param>
         private void RevealNeighbors(GridButton buttonClicked)
         {
             int rowClicked = buttonClicked.Row, colClicked = buttonClicked.Col;
@@ -142,8 +154,8 @@ namespace Minesweeper
         }
 
         /// <summary>
-        /// Fill random squares with mines. Squares adjacent to square given by parameters <code>rowClicked, colClicked</code>
-        /// can't have a mine.
+        ///     Fill random squares with mines. Squares adjacent to square given by parameters <code>rowClicked, colClicked</code>
+        ///     can't have a mine.
         /// </summary>
         /// <param name="minesToGenerate"> number of mines to generate</param>
         /// <param name="rowClicked"> row of a button that has been clicked by a user </param>
@@ -191,12 +203,14 @@ namespace Minesweeper
                     };
                     button.SetContent(block);
                 }
+
                 --TilesRemaining;
                 button.IsEnabled = false;
             }
         }
+
         /// <summary>
-        /// Counts number of marked squares around a given square.
+        ///     Counts number of marked squares around a given square.
         /// </summary>
         /// <param name="rowClicked"> row number of clicked square </param>
         /// <param name="colClicked"> col number of clicked square </param>
@@ -208,21 +222,22 @@ namespace Minesweeper
             int minesCount = BoardValues[rowClicked, colClicked];
             int counter = 0;
             for (int i = -1; i <= 1; ++i)
-                for (int j = -1; j <= 1; ++j)
-                {
-                    int r = rowClicked + i, c = colClicked + j;
-                    if(!IsValid(r, c, rows, cols))
-                        continue;
-                    GridButton button = buttons[r * cols + c];
-                    if (button.IsMarked)
-                        ++counter;
-                }
+            for (int j = -1; j <= 1; ++j)
+            {
+                int r = rowClicked + i, c = colClicked + j;
+                if (!IsValid(r, c, rows, cols))
+                    continue;
+                GridButton button = buttons[r * cols + c];
+                if (button.IsMarked)
+                    ++counter;
+            }
 
             return counter == minesCount;
         }
+
         /// <summary>
-        /// Checks if marked squares have value equal to -1. Method should be only if <code>CountMakredSquares</code>
-        /// returns true.
+        ///     Checks if marked squares have value equal to -1. Method should be only if <code>CountMakredSquares</code>
+        ///     returns true.
         /// </summary>
         /// <param name="rowClicked"> row number of clicked square </param>
         /// <param name="colClicked"> col number of clicked square </param>
@@ -234,58 +249,53 @@ namespace Minesweeper
             bool areMarkedCorrect = true;
 
             for (int i = -1; i <= 1; ++i)
-                for (int j = -1; j <= 1; ++j)
-                {
-                    int r = rowClicked + i, c = colClicked + j;
-                    if (!IsValid(r, c, rows, cols))
-                        continue;
-                    GridButton button = buttons[r * cols + c];
+            for (int j = -1; j <= 1; ++j)
+            {
+                int r = rowClicked + i, c = colClicked + j;
+                if (!IsValid(r, c, rows, cols))
+                    continue;
+                GridButton button = buttons[r * cols + c];
 
-                    if (!button.IsMarked)
-                        continue;
-                    // Check if square is marked rightfully
-                    if (BoardValues[rowClicked + i, colClicked + j] != -1)
-                    {
-                        areMarkedCorrect = false;
-                        break;
-                    }
+                if (!button.IsMarked)
+                    continue;
+                // Check if square is marked rightfully
+                if (BoardValues[rowClicked + i, colClicked + j] != -1)
+                {
+                    areMarkedCorrect = false;
+                    break;
                 }
+            }
 
             return areMarkedCorrect;
         }
 
         /// <summary>
-        /// Fill non mines squares with values that represent number of neighboring mines.
+        ///     Fill non mines squares with values that represent number of neighboring mines.
         /// </summary>
         private void GenerateNonMinesSquares()
         {
             int rows = LevelSettings.GetLevelSettings(Difficulty).Rows;
             int cols = LevelSettings.GetLevelSettings(Difficulty).Cols;
             for (int i = 0; i < rows; ++i)
+            for (int j = 0; j < cols; ++j)
             {
-                for (int j = 0; j < cols; ++j)
-                {
-                    if (BoardValues[i, j] == -1)
-                        continue;
+                if (BoardValues[i, j] == -1)
+                    continue;
 
-                    int counter = 0;
-                    // Check all neighbors of a square
-                    for (int adjRow = -1; adjRow <= 1; ++adjRow)
-                    {
-                        for (int adjCol = -1; adjCol <= 1; ++adjCol)
-                        {
-                            if (IsValid(i + adjRow, j + adjCol, rows, cols) &&
-                                BoardValues[i + adjRow, j + adjCol] == -1)
-                                ++counter;
-                        }
-                    }
-                    BoardValues[i, j] = counter;
-                }
+                int counter = 0;
+                // Check all neighbors of a square
+                for (int adjRow = -1; adjRow <= 1; ++adjRow)
+                for (int adjCol = -1; adjCol <= 1; ++adjCol)
+                    if (IsValid(i + adjRow, j + adjCol, rows, cols) &&
+                        BoardValues[i + adjRow, j + adjCol] == -1)
+                        ++counter;
+
+                BoardValues[i, j] = counter;
             }
         }
 
         /// <summary>
-        ///  Method called when square with value of 0  was clicked on
+        ///     Method called when square with value of 0  was clicked on
         /// </summary>
         /// <param name="row"> row number of clicked square </param>
         /// <param name="col"> col number of clicked square </param>
@@ -298,35 +308,37 @@ namespace Minesweeper
             List<int> squaresToReveal = new List<int> { row * cols + col };
             visited[row, col] = true;
             for (int adjRow = -1; adjRow <= 1; ++adjRow)
+            for (int adjCol = -1; adjCol <= 1; ++adjCol)
             {
-                for (int adjCol = -1; adjCol <= 1; ++adjCol)
+                if (!IsValid(row + adjRow, col + adjCol, rows, cols))
+                    continue;
+                if (BoardValues[row + adjRow, col + adjCol] == 0 && visited[row + adjRow, col + adjCol] == false)
                 {
-                    if (!IsValid(row + adjRow, col + adjCol, rows, cols))
-                        continue;
-                    if (BoardValues[row + adjRow, col + adjCol] == 0 && visited[row + adjRow, col + adjCol] == false)
-                    {
-                        int index = (row + adjRow) * cols + (col + adjCol); // index of square in grid
-                        squaresToReveal.Add(index);
-                        squaresToReveal.AddRange(GetSquaresToReveal(row + adjRow, col + adjCol, rows, cols, visited));
-                    }else if (BoardValues[row + adjRow, col + adjCol] > 0 && visited[row + adjRow, col + adjCol] == false)
-                    {
-                        int index = (row + adjRow) * cols + (col + adjCol); // index of square in grid
-                        squaresToReveal.Add(index);
-                        visited[row + adjRow, col + adjCol] = true;
-                    }
+                    int index = (row + adjRow) * cols + col + adjCol; // index of square in grid
+                    squaresToReveal.Add(index);
+                    squaresToReveal.AddRange(GetSquaresToReveal(row + adjRow, col + adjCol, rows, cols, visited));
+                }
+                else if (BoardValues[row + adjRow, col + adjCol] > 0 &&
+                         visited[row + adjRow, col + adjCol] == false)
+                {
+                    int index = (row + adjRow) * cols + col + adjCol; // index of square in grid
+                    squaresToReveal.Add(index);
+                    visited[row + adjRow, col + adjCol] = true;
                 }
             }
+
             return squaresToReveal;
         }
+
         /// <summary>
-        /// Assign correct UIElement to buttons
+        ///     Assign correct UIElement to buttons
         /// </summary>
         /// <param name="buttonClicked"> clicked button </param>
         private void AssignContentOfButton(GridButton buttonClicked)
         {
             int rows = LevelSettings.GetLevelSettings(Difficulty).Rows;
             int cols = LevelSettings.GetLevelSettings(Difficulty).Cols;
-            int valueClicked = BoardValues[buttonClicked.Row , buttonClicked.Col];
+            int valueClicked = BoardValues[buttonClicked.Row, buttonClicked.Col];
             switch (valueClicked)
             {
                 case -1:
@@ -357,32 +369,35 @@ namespace Minesweeper
                     break;
                 }
             }
-
         }
 
+        /// <summary>
+        ///     Executed when mine was clicked
+        /// </summary>
         private void MineClicked()
         {
             int rows = LevelSettings.GetLevelSettings(Difficulty).Rows;
             int cols = LevelSettings.GetLevelSettings(Difficulty).Cols;
             // Reveal all mines
             for (int i = 0; i < rows; ++i)
-            {
-                for (int j = 0; j < cols; ++j)
+            for (int j = 0; j < cols; ++j)
+                if (BoardValues[i, j] == -1)
                 {
-                    if (BoardValues[i, j] == -1)
+                    Image image = new Image
                     {
-                        Image image = new Image
-                        {
-                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/mine_icon.png"))
-                        };
-                        int index = i * cols + j;
-                        buttons[index].SetContent(image);
-                    }
+                        Source = new BitmapImage(new Uri("pack://application:,,,/Resources/mine_icon.png"))
+                    };
+                    int index = i * cols + j;
+                    buttons[index].SetContent(image);
                 }
-            }
+
             IsGameLost = true;
         }
 
+        /// <summary>
+        ///     Resets board
+        /// </summary>
+        /// <param name="difficulty"> difficulty of the game to start </param>
         public void ResetGame(LevelSettings.Difficulty difficulty)
         {
             buttons.Clear();

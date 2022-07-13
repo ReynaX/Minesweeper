@@ -1,12 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-
 
 namespace Minesweeper
 {
@@ -16,6 +14,7 @@ namespace Minesweeper
     public partial class MainWindow
     {
         public static readonly RoutedCommand Command = new RoutedCommand();
+
         /// <summary>
         ///     Initializes component and fills grid with default number of rows and cols.
         /// </summary>
@@ -38,9 +37,7 @@ namespace Minesweeper
                 return;
 
             if (GameLogicController.Instance.IsFirstMove)
-            {
                 GameLogicController.Instance.StartNewGame(button.Row, button.Col);
-            }
 
             if (button.IsMarked)
                 return;
@@ -71,20 +68,25 @@ namespace Minesweeper
             CheckForEmojiChange();
         }
 
+        /// <summary>
+        ///     Called when button with an emoji was clicked
+        /// </summary>
         private void OnNewGameButtonClicked(object sender, RoutedEventArgs e)
         {
             ChangeGridSize(GameLogicController.Instance.Difficulty);
         }
 
+        /// <summary>
+        ///     Called when any difficulty menu item was clicekd
+        /// </summary>
         private void OnDifficultyChanged(object sender, RoutedEventArgs e)
         {
-            Trace.WriteLine(sender.GetType());
             if (!(sender is CheckableMenuGroup item))
-              return;
+                return;
 
             if (item.Parent is ItemsControl ic)
             {
-                var rmi = ic.Items.OfType<CheckableMenuGroup>().First(i =>
+                CheckableMenuGroup rmi = ic.Items.OfType<CheckableMenuGroup>().First(i =>
                     i.GroupName == item.GroupName && i.IsChecked);
                 rmi.IsChecked = false;
 
@@ -94,9 +96,13 @@ namespace Minesweeper
             ChangeGridSize(item.Difficulty);
         }
 
+        /// <summary>
+        ///     Called whenever the game starts from the beginning.
+        ///     Clear content of a grid and reinitializes rows and columns
+        /// </summary>
+        /// <param name="difficulty"> difficulty of the game to start </param>
         private void ChangeGridSize(LevelSettings.Difficulty difficulty)
         {
-
             ButtonsGrid.Children.Clear();
             ButtonsGrid.RowDefinitions.Clear();
             ButtonsGrid.ColumnDefinitions.Clear();
@@ -139,7 +145,9 @@ namespace Minesweeper
             NewGameButton.Content = image;
         }
 
-
+        /// <summary>
+        ///     Checks if the game is whether won or lost and changes the emoji on new game button.
+        /// </summary>
         private void CheckForEmojiChange()
         {
             if (GameLogicController.Instance.IsGameLost)
@@ -165,25 +173,5 @@ namespace Minesweeper
         {
             Application.Current.Shutdown();
         }
-
-        private void DifficultyChangedWithShortcut(object sender, ExecutedRoutedEventArgs e)
-        {
-            var menuItem = sender as CheckableMenuGroup;
-            Trace.WriteLine(sender.GetType());
-            //menuItem.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
-        }
-
-
-        private void DifficultyChangeCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
-
-        private void ExitCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
     }
 }

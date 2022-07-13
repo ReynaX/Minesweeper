@@ -4,7 +4,12 @@ namespace Minesweeper
 {
     public static class LevelSettings
     {
-        public enum Difficulty : uint { Beginner = 0, Intermediate, Expert };
+        public enum Difficulty : uint
+        {
+            Beginner = 0,
+            Intermediate,
+            Expert
+        }
 
         private static Dictionary<Difficulty, Settings> levelSettings;
         private static bool areLevelSettingsLoaded;
@@ -22,9 +27,9 @@ namespace Minesweeper
 
             levelSettings = new Dictionary<Difficulty, Settings>
             {
-                { Difficulty.Beginner, new Settings(8, 8, 10)},
-                { Difficulty.Intermediate, new Settings(16, 16, 40)},
-                { Difficulty.Expert, new Settings(30, 16, 99)},
+                { Difficulty.Beginner, new Settings(8, 8, 10) },
+                { Difficulty.Intermediate, new Settings(16, 16, 40) },
+                { Difficulty.Expert, new Settings(30, 16, 99) }
             };
             areLevelSettingsLoaded = true;
         }
