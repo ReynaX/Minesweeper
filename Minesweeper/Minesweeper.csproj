@@ -69,6 +69,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="src\CheckableMenuGroup.cs" />
     <Compile Include="src\GameLogicController.cs" />
     <Compile Include="src\GridButton.cs" />
     <Compile Include="src\LevelSettings.cs" />

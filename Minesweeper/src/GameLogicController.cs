@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -8,20 +7,33 @@ using System.Windows.Media.Imaging;
 
 namespace Minesweeper
 {
-    internal class GameLogicController
+    public sealed class GameLogicController
     {
+        private static GameLogicController instance;
+
+        public static GameLogicController Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new GameLogicController(LevelSettings.Difficulty.Beginner);
+                return instance;
+            }
+        }
+
         public enum Action { Mark, Unmark, Reveal, RevealNeighbors };
-        public LevelSettings.Difficulty Difficulty { get; private set; }
-        private List<GridButton> buttons;
+
+        public LevelSettings.Difficulty Difficulty { get;  private set; }
+        private readonly List<GridButton> buttons;
 
         public bool IsGameLost { get; private set; }
         public bool IsFirstMove { get; private set; }
         public int TilesRemaining { get; private set; }
         public int MinesMarked { get; private set; }
 
-        public int[,] BoardValues { get; private set; }
+        private int[,] BoardValues { get;  set; }
 
-        public GameLogicController(LevelSettings.Difficulty difficulty)
+        private GameLogicController(LevelSettings.Difficulty difficulty)
         {
             buttons = new List<GridButton>(TilesRemaining);
             IsFirstMove = true;
@@ -30,15 +42,13 @@ namespace Minesweeper
         /// <summary>
         /// Start a new game with given difficulty. Button in given row and column will have a value 0.
         /// </summary>
-        /// <param name="difficulty"> difficulty of a new game </param>
         /// <param name="rowClicked"> row of a button that has been clicked by a user </param>
         /// <param name="colClicked"> col of a button that has been clicked by a user </param>
-        public void StartNewGame(LevelSettings.Difficulty difficulty, int rowClicked, int colClicked)
+        public void StartNewGame(int rowClicked, int colClicked)
         {
-            Difficulty = difficulty;
             IsGameLost = false;
             IsFirstMove = false;
-            LevelSettings.Settings settings = LevelSettings.GetLevelSettings(difficulty);
+            LevelSettings.Settings settings = LevelSettings.GetLevelSettings(Difficulty);
 
             BoardValues = new int[settings.Rows, settings.Cols];
             TilesRemaining = settings.Rows * settings.Cols;
@@ -273,6 +283,7 @@ namespace Minesweeper
         /// <param name="col"> col number of clicked square </param>
         /// <param name="rows"> number of rows in current game difficulty </param>
         /// <param name="cols"> number of columns in current game difficulty </param>
+        /// <param name="visited"> saves squares that have been visited already to avoid infinite recursion</param>
         /// <returns> List of indices of squares to reveal given by equation (row * cols + col)  </returns>
         private List<int> GetSquaresToReveal(int row, int col, int rows, int cols, bool[,] visited)
         {
@@ -357,19 +368,14 @@ namespace Minesweeper
 
         }
 
-        public void ResetSquares()
+        public void ResetGame(LevelSettings.Difficulty difficulty)
         {
-            foreach(var button in buttons)
-            {
-                button.IsEnabled = true;
-                button.IsMarked = false;
-                button.SetContent(new UIElement());
-            }
+            buttons.Clear();
 
+            Difficulty = difficulty;
             IsGameLost = false;
             IsFirstMove = true;
-            LevelSettings.Settings settings = LevelSettings.GetLevelSettings(LevelSettings.Difficulty.Beginner);
-
+            LevelSettings.Settings settings = LevelSettings.GetLevelSettings(Difficulty);
             BoardValues = new int[settings.Rows, settings.Cols];
             TilesRemaining = settings.Rows * settings.Cols;
             MinesMarked = 0;

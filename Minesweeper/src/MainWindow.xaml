@@ -6,7 +6,23 @@
         xmlns:local="clr-namespace:Minesweeper"
         mc:Ignorable="d"
         Title="MainWindow" Height="300" Width="300">
-    <Grid x:Name="menuGrid" Margin="0,0,0,0" Height="Auto" Width="Auto">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Game">
+                <MenuItem Header="_New game" InputGestureText="Ctrl+N"></MenuItem>
+                <MenuItem Header="_Pause" InputGestureText="Ctrl+P"></MenuItem>
+                <Separator></Separator>
+                <local:CheckableMenuGroup Header="_Beginner" InputGestureText="Ctrl+B" GroupName="Difficulty" IsChecked="True" Difficulty="Beginner" Click="OnDifficultyChanged"/>
+                <local:CheckableMenuGroup Header="_Intermediate" InputGestureText="Ctrl+I" GroupName="Difficulty" Difficulty="Intermediate" Click="OnDifficultyChanged"/>
+                <local:CheckableMenuGroup Header="_Expert" InputGestureText="Ctrl+E" GroupName="Difficulty" Difficulty="Expert" Click="OnDifficultyChanged"/>
+                <Separator></Separator>
+                <MenuItem Header="_Quit" InputGestureText="Ctrl+Q"></MenuItem>
+            </MenuItem>
+        </Menu>
+
+
+    <Grid Margin="0,0,0,0" Height="Auto" Width="Auto">
+
         <Grid.RowDefinitions>
             <RowDefinition MaxHeight="50"></RowDefinition>
             <RowDefinition></RowDefinition>
@@ -17,21 +33,21 @@
                 <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="XD"></TextBlock>
-        <Border Background="LightGray" Grid.ColumnSpan="3"></Border>
-        <Button Grid.Column="1" Content="New" Width="45" Height="45" Click="OnNewGameButtonClicked">
+        <Border Grid.Row="0" Grid.Column="0" Background="LightGray" Grid.ColumnSpan="3"></Border>
+        <Button Grid.Row="0" Grid.Column="1" Content="New" Width="45" Height="45" Click="OnNewGameButtonClicked">
                 <Button.ContentTemplate>
                     <DataTemplate>
                         <Image Source="/Resources/happy_emoji_icon.png" Width="40" Height="40"></Image>
                     </DataTemplate>
                 </Button.ContentTemplate>
             </Button>
-            <TextBlock Grid.Column="0" Text="XD"></TextBlock>
-
-        <Border  Grid.Row="1"  Grid.ColumnSpan="3" BorderBrush="LightGray" BorderThickness="5">
-            <Grid x:Name="buttonsGrid" Margin="0,0,0,0" Height="Auto" Width="Auto">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="XD"></TextBlock>
+        
+        <Border  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="LightGray" BorderThickness="5">
+            <Grid x:Name="ButtonsGrid" Margin="0,0,0,0" Height="Auto" Width="Auto">
             </Grid>
         </Border>
     </Grid>
-
+</DockPanel>
 
 </Window>

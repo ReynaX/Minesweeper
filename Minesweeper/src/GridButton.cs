@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 namespace Minesweeper
 {
-    class GridButton : Button
+    public class GridButton : Button
     {
         public GridButton(int row, int col)
         {
