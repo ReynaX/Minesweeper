@@ -1,9 +1,11 @@
 ﻿
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 
 namespace Minesweeper
@@ -13,8 +15,7 @@ namespace Minesweeper
     /// </summary>
     public partial class MainWindow
     {
-        //private readonly LevelSettings.Difficulty difficulty;
-
+        public static readonly RoutedCommand Command = new RoutedCommand();
         /// <summary>
         ///     Initializes component and fills grid with default number of rows and cols.
         /// </summary>
@@ -29,9 +30,9 @@ namespace Minesweeper
         /// <summary>
         ///     Method called when left mouse button was clicked on a button from a grid.
         /// </summary>
-        private static void OnLeftMouseButtonClicked(object sender, MouseButtonEventArgs e)
+        private void OnLeftMouseButtonClicked(object sender, MouseButtonEventArgs e)
         {
-            if (GameLogicController.Instance.IsGameLost)
+            if (GameLogicController.Instance.IsGameLost || GameLogicController.Instance.IsGameWon)
                 return;
             if (!(sender is ContentControl cc) || !(cc.Content is GridButton button))
                 return;
@@ -49,14 +50,15 @@ namespace Minesweeper
             else
                 GameLogicController.Instance.MakeAction(GameLogicController.Action.Reveal, button);
             Trace.WriteLine("Tiles remaining: " + GameLogicController.Instance.TilesRemaining);
+            CheckForEmojiChange();
         }
 
         /// <summary>
         ///     Method called when right mouse button was clicked on a button from a grid.
         /// </summary>
-        private static void OnRightMouseButtonClicked(object sender, MouseButtonEventArgs e)
+        private void OnRightMouseButtonClicked(object sender, MouseButtonEventArgs e)
         {
-            if (GameLogicController.Instance.IsGameLost)
+            if (GameLogicController.Instance.IsGameLost || GameLogicController.Instance.IsGameWon)
                 return;
             if (!(sender is ContentControl cc) || !(cc.Content is GridButton button))
                 return;
@@ -65,6 +67,8 @@ namespace Minesweeper
             if (!button.IsMarked) GameLogicController.Instance.MakeAction(GameLogicController.Action.Mark, button);
             else GameLogicController.Instance.MakeAction(GameLogicController.Action.Unmark, button);
             Trace.WriteLine("Mines marked: " + GameLogicController.Instance.MinesMarked);
+
+            CheckForEmojiChange();
         }
 
         private void OnNewGameButtonClicked(object sender, RoutedEventArgs e)
@@ -74,8 +78,9 @@ namespace Minesweeper
 
         private void OnDifficultyChanged(object sender, RoutedEventArgs e)
         {
+            Trace.WriteLine(sender.GetType());
             if (!(sender is CheckableMenuGroup item))
-                return;
+              return;
 
             if (item.Parent is ItemsControl ic)
             {
@@ -91,6 +96,7 @@ namespace Minesweeper
 
         private void ChangeGridSize(LevelSettings.Difficulty difficulty)
         {
+
             ButtonsGrid.Children.Clear();
             ButtonsGrid.RowDefinitions.Clear();
             ButtonsGrid.ColumnDefinitions.Clear();
@@ -125,6 +131,59 @@ namespace Minesweeper
 
                 GameLogicController.Instance.AddNewButton(button);
             }
+
+            Image image = new Image
+            {
+                Source = new BitmapImage(new Uri("pack://application:,,,/Resources/happy_emoji_icon.png"))
+            };
+            NewGameButton.Content = image;
         }
+
+
+        private void CheckForEmojiChange()
+        {
+            if (GameLogicController.Instance.IsGameLost)
+            {
+                Image image = new Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/sad_emoji_icon.png"))
+                };
+                NewGameButton.Content = image;
+            }
+
+            if (GameLogicController.Instance.IsGameWon)
+            {
+                Image image = new Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/chad_emoji_icon.png"))
+                };
+                NewGameButton.Content = image;
+            }
+        }
+
+        private void OnQuitMenuItemClicked(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void DifficultyChangedWithShortcut(object sender, ExecutedRoutedEventArgs e)
+        {
+            var menuItem = sender as CheckableMenuGroup;
+            Trace.WriteLine(sender.GetType());
+            //menuItem.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+        }
+
+
+        private void DifficultyChangeCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+
+        private void ExitCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
     }
 }

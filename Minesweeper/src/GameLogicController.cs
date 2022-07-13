@@ -27,6 +27,7 @@ namespace Minesweeper
         private readonly List<GridButton> buttons;
 
         public bool IsGameLost { get; private set; }
+        public bool IsGameWon { get; private set; }
         public bool IsFirstMove { get; private set; }
         public int TilesRemaining { get; private set; }
         public int MinesMarked { get; private set; }
@@ -35,6 +36,7 @@ namespace Minesweeper
 
         private GameLogicController(LevelSettings.Difficulty difficulty)
         {
+            Difficulty = difficulty;
             buttons = new List<GridButton>(TilesRemaining);
             IsFirstMove = true;
         }
@@ -47,6 +49,7 @@ namespace Minesweeper
         public void StartNewGame(int rowClicked, int colClicked)
         {
             IsGameLost = false;
+            IsGameWon = false;
             IsFirstMove = false;
             LevelSettings.Settings settings = LevelSettings.GetLevelSettings(Difficulty);
 
@@ -85,6 +88,10 @@ namespace Minesweeper
                     RevealNeighbors(buttonClicked);
                     break;
             }
+
+            if (TilesRemaining - MinesMarked == 0 && 
+                MinesMarked == LevelSettings.GetLevelSettings(Difficulty).Mines)
+                IsGameWon = true;
         }
 
         /// <summary>
@@ -122,6 +129,7 @@ namespace Minesweeper
                 if (!areMarksCorrect)
                 {
                     IsGameLost = true;
+                    MineClicked();
                     return;
                 }
 
@@ -323,23 +331,7 @@ namespace Minesweeper
             {
                 case -1:
                 {
-                    // Reveal all mines
-                    for (int i = 0; i < rows; ++i)
-                    {
-                        for (int j = 0; j < cols; ++j)
-                        {
-                            if (BoardValues[i, j] == -1)
-                            {
-                                Image image = new Image
-                                {
-                                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/mine_icon.png"))
-                                };
-                                int index = i * cols + j;
-                                buttons[index].SetContent(image);
-                            }
-                        }
-                    }
-                    IsGameLost = true;
+                    MineClicked();
                     break;
                 }
                 case 0:
@@ -368,12 +360,36 @@ namespace Minesweeper
 
         }
 
+        private void MineClicked()
+        {
+            int rows = LevelSettings.GetLevelSettings(Difficulty).Rows;
+            int cols = LevelSettings.GetLevelSettings(Difficulty).Cols;
+            // Reveal all mines
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = 0; j < cols; ++j)
+                {
+                    if (BoardValues[i, j] == -1)
+                    {
+                        Image image = new Image
+                        {
+                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/mine_icon.png"))
+                        };
+                        int index = i * cols + j;
+                        buttons[index].SetContent(image);
+                    }
+                }
+            }
+            IsGameLost = true;
+        }
+
         public void ResetGame(LevelSettings.Difficulty difficulty)
         {
             buttons.Clear();
 
             Difficulty = difficulty;
             IsGameLost = false;
+            IsGameWon = false;
             IsFirstMove = true;
             LevelSettings.Settings settings = LevelSettings.GetLevelSettings(Difficulty);
             BoardValues = new int[settings.Rows, settings.Cols];

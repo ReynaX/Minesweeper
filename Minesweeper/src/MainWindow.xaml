@@ -5,18 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Minesweeper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="300" Width="300">
+        Title="MainWindow" Height="500" Width="500">
+
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Game">
-                <MenuItem Header="_New game" InputGestureText="Ctrl+N"></MenuItem>
+                <MenuItem Header="_New game" InputGestureText="Ctrl+N" Click="OnNewGameButtonClicked"></MenuItem>
                 <MenuItem Header="_Pause" InputGestureText="Ctrl+P"></MenuItem>
                 <Separator></Separator>
-                <local:CheckableMenuGroup Header="_Beginner" InputGestureText="Ctrl+B" GroupName="Difficulty" IsChecked="True" Difficulty="Beginner" Click="OnDifficultyChanged"/>
-                <local:CheckableMenuGroup Header="_Intermediate" InputGestureText="Ctrl+I" GroupName="Difficulty" Difficulty="Intermediate" Click="OnDifficultyChanged"/>
-                <local:CheckableMenuGroup Header="_Expert" InputGestureText="Ctrl+E" GroupName="Difficulty" Difficulty="Expert" Click="OnDifficultyChanged"/>
+                <local:CheckableMenuGroup x:Name="BeginnerMenuItem" Header="_Beginner" GroupName="Difficulty" IsChecked="True" Difficulty="Beginner" Click="OnDifficultyChanged"/>
+                <local:CheckableMenuGroup x:Name="IntermediateMenuItem" Header="_Intermediate" GroupName="Difficulty" Difficulty="Intermediate" Click="OnDifficultyChanged"/>
+                <local:CheckableMenuGroup x:Name="ExpertMenuItem" Header="_Expert" GroupName="Difficulty" Difficulty="Expert" Click="OnDifficultyChanged"/>
                 <Separator></Separator>
-                <MenuItem Header="_Quit" InputGestureText="Ctrl+Q"></MenuItem>
+                <MenuItem Header="_Quit" InputGestureText="Ctrl+Q" Click="OnQuitMenuItemClicked"></MenuItem>
             </MenuItem>
         </Menu>
 
@@ -34,14 +35,10 @@
         </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="XD"></TextBlock>
         <Border Grid.Row="0" Grid.Column="0" Background="LightGray" Grid.ColumnSpan="3"></Border>
-        <Button Grid.Row="0" Grid.Column="1" Content="New" Width="45" Height="45" Click="OnNewGameButtonClicked">
-                <Button.ContentTemplate>
-                    <DataTemplate>
-                        <Image Source="/Resources/happy_emoji_icon.png" Width="40" Height="40"></Image>
-                    </DataTemplate>
-                </Button.ContentTemplate>
-            </Button>
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="XD"></TextBlock>
+        <Button x:Name="NewGameButton" Grid.Row="0" Grid.Column="1" Width="45" Height="45" Click="OnNewGameButtonClicked">
+            <Image x:Name="GameStateImage" Source="/Resources/happy_emoji_icon.png" Width="40" Height="40"></Image>
+        </Button>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="XD"></TextBlock>
         
         <Border  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="LightGray" BorderThickness="5">
             <Grid x:Name="ButtonsGrid" Margin="0,0,0,0" Height="Auto" Width="Auto">
