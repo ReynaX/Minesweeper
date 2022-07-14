@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace Minesweeper
 {
@@ -13,19 +16,48 @@ namespace Minesweeper
     /// </summary>
     public partial class MainWindow
     {
-        public static readonly RoutedCommand Command = new RoutedCommand();
-
+        private readonly DispatcherTimer timer;
+        private long time;
         /// <summary>
         ///     Initializes component and fills grid with default number of rows and cols.
         /// </summary>
         public MainWindow()
         {
             InitializeComponent();
-            const LevelSettings.Difficulty difficulty = LevelSettings.Difficulty.Beginner;
+
+            timer = new DispatcherTimer();
+            timer.Tick += UpdateClock;
+            timer.Interval = new TimeSpan(0, 0, 1);
+            LevelSettings.Difficulty difficulty = LevelSettings.DefaultDifficulty;
 
             ChangeGridSize(difficulty);
         }
 
+        private void UpdateMinesCounter()
+        {
+            int minesLeft = LevelSettings.GetLevelSettings(GameLogicController.Instance.Difficulty).Mines -
+                            GameLogicController.Instance.MinesMarked;
+            MinesLeftLabel.Text = (minesLeft).ToString("D3");
+            if (minesLeft == 0)
+                MinesLeftLabel.Foreground = Brushes.Aquamarine;
+            else MinesLeftLabel.Foreground = Brushes.Red;
+        }
+
+        private void UpdateClock(object sender, EventArgs e)
+        {
+            if (timer.IsEnabled)
+            {
+                time += 1;
+                TimerLabel.Text = time.ToString("D3");
+            }
+        }
+
+        private void RestartClock()
+        {
+            timer.Stop();
+            time = 0;
+            TimerLabel.Text = time.ToString("D3");
+        }
         /// <summary>
         ///     Method called when left mouse button was clicked on a button from a grid.
         /// </summary>
@@ -33,11 +65,15 @@ namespace Minesweeper
         {
             if (GameLogicController.Instance.IsGameLost || GameLogicController.Instance.IsGameWon)
                 return;
+
             if (!(sender is ContentControl cc) || !(cc.Content is GridButton button))
                 return;
 
             if (GameLogicController.Instance.IsFirstMove)
+            {
                 GameLogicController.Instance.StartNewGame(button.Row, button.Col);
+                timer.Start();
+            }
 
             if (button.IsMarked)
                 return;
@@ -46,7 +82,6 @@ namespace Minesweeper
                 GameLogicController.Instance.MakeAction(GameLogicController.Action.RevealNeighbors, button);
             else
                 GameLogicController.Instance.MakeAction(GameLogicController.Action.Reveal, button);
-            Trace.WriteLine("Tiles remaining: " + GameLogicController.Instance.TilesRemaining);
             CheckForEmojiChange();
         }
 
@@ -57,14 +92,14 @@ namespace Minesweeper
         {
             if (GameLogicController.Instance.IsGameLost || GameLogicController.Instance.IsGameWon)
                 return;
+
             if (!(sender is ContentControl cc) || !(cc.Content is GridButton button))
                 return;
             if (!button.IsEnabled)
                 return;
             if (!button.IsMarked) GameLogicController.Instance.MakeAction(GameLogicController.Action.Mark, button);
             else GameLogicController.Instance.MakeAction(GameLogicController.Action.Unmark, button);
-            Trace.WriteLine("Mines marked: " + GameLogicController.Instance.MinesMarked);
-
+            UpdateMinesCounter();
             CheckForEmojiChange();
         }
 
@@ -74,6 +109,8 @@ namespace Minesweeper
         private void OnNewGameButtonClicked(object sender, RoutedEventArgs e)
         {
             ChangeGridSize(GameLogicController.Instance.Difficulty);
+            RestartClock();
+            UpdateMinesCounter();
         }
 
         /// <summary>
@@ -92,8 +129,7 @@ namespace Minesweeper
 
                 item.IsChecked = true;
             }
-
-            ChangeGridSize(item.Difficulty);
+            OnNewGameButtonClicked(null, new RoutedEventArgs());
         }
 
         /// <summary>
@@ -157,6 +193,7 @@ namespace Minesweeper
                     Source = new BitmapImage(new Uri("pack://application:,,,/Resources/sad_emoji_icon.png"))
                 };
                 NewGameButton.Content = image;
+                timer.Stop();
             }
 
             if (GameLogicController.Instance.IsGameWon)
@@ -166,6 +203,7 @@ namespace Minesweeper
                     Source = new BitmapImage(new Uri("pack://application:,,,/Resources/chad_emoji_icon.png"))
                 };
                 NewGameButton.Content = image;
+                timer.Stop();
             }
         }
 

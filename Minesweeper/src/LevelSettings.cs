@@ -11,6 +11,8 @@ namespace Minesweeper
             Expert
         }
 
+        public static Difficulty DefaultDifficulty => Difficulty.Beginner;
+
         private static Dictionary<Difficulty, Settings> levelSettings;
         private static bool areLevelSettingsLoaded;
 

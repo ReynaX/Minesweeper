@@ -6,18 +6,24 @@
         xmlns:local="clr-namespace:Minesweeper"
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="500">
-
+    <Window.InputBindings>
+        <KeyBinding Command="Close" Key="Q" Modifiers="Control"></KeyBinding>
+        <KeyBinding Command="New" Key="N" Modifiers="Control"></KeyBinding>
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="Close" Executed="OnQuitMenuItemClicked"></CommandBinding>
+        <CommandBinding Command="New" Executed="OnNewGameButtonClicked"></CommandBinding>
+    </Window.CommandBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Game">
-                <MenuItem Header="_New game" InputGestureText="Ctrl+N" Click="OnNewGameButtonClicked"></MenuItem>
-                <MenuItem Header="_Pause" InputGestureText="Ctrl+P"></MenuItem>
+                <MenuItem Command="New" Header="_New game" InputGestureText="Ctrl+N" Click="OnNewGameButtonClicked"></MenuItem>
                 <Separator></Separator>
-                <local:CheckableMenuGroup x:Name="BeginnerMenuItem" Header="_Beginner" GroupName="Difficulty" IsChecked="True" Difficulty="Beginner" Click="OnDifficultyChanged"/>
-                <local:CheckableMenuGroup x:Name="IntermediateMenuItem" Header="_Intermediate" GroupName="Difficulty" Difficulty="Intermediate" Click="OnDifficultyChanged"/>
-                <local:CheckableMenuGroup x:Name="ExpertMenuItem" Header="_Expert" GroupName="Difficulty" Difficulty="Expert" Click="OnDifficultyChanged"/>
+                <local:CheckableMenuGroup Header="_Beginner" GroupName="Difficulty" IsChecked="True" Difficulty="Beginner" Click="OnDifficultyChanged"/>
+                <local:CheckableMenuGroup Header="_Intermediate" GroupName="Difficulty" Difficulty="Intermediate" Click="OnDifficultyChanged"/>
+                <local:CheckableMenuGroup Header="_Expert" GroupName="Difficulty" Difficulty="Expert" Click="OnDifficultyChanged"/>
                 <Separator></Separator>
-                <MenuItem Header="_Quit" InputGestureText="Ctrl+Q" Click="OnQuitMenuItemClicked"></MenuItem>
+                <MenuItem Command="Close" Header="_Quit" InputGestureText="Ctrl+Q" Click="OnQuitMenuItemClicked"></MenuItem>
             </MenuItem>
         </Menu>
 
@@ -38,13 +44,18 @@
         <Button x:Name="NewGameButton" Grid.Row="0" Grid.Column="1" Width="45" Height="45" Click="OnNewGameButtonClicked">
             <Image x:Name="GameStateImage" Source="/Resources/happy_emoji_icon.png" Width="40" Height="40"></Image>
         </Button>
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="XD"></TextBlock>
-        
-        <Border  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="LightGray" BorderThickness="5">
+        <Border Grid.Row="0" Grid.Column="0">
+            <TextBlock  Name="MinesLeftLabel" Background="Black" Foreground="Red" FontSize="48" TextAlignment="Center" Text="010" VerticalAlignment="Center"></TextBlock>
+        </Border>
+
+            <Border  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="LightGray" BorderThickness="5">
             <Grid x:Name="ButtonsGrid" Margin="0,0,0,0" Height="Auto" Width="Auto">
             </Grid>
         </Border>
-    </Grid>
+            <Border Grid.Row="0" Grid.Column="2">
+                <TextBlock  Name="TimerLabel" Background="Black" Foreground="Red" FontSize="48" TextAlignment="Center" Text="000" VerticalAlignment="Center"></TextBlock>
+            </Border>
+        </Grid>
 </DockPanel>
 
 </Window>

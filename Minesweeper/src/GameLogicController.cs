@@ -34,7 +34,7 @@ namespace Minesweeper
             get
             {
                 if (instance == null)
-                    instance = new GameLogicController(LevelSettings.Difficulty.Beginner);
+                    instance = new GameLogicController(LevelSettings.DefaultDifficulty);
                 return instance;
             }
         }
