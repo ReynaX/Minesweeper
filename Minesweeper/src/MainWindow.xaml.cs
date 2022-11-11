@@ -128,6 +128,7 @@ namespace Minesweeper
                 rmi.IsChecked = false;
 
                 item.IsChecked = true;
+                GameLogicController.Instance.Difficulty = item.Difficulty;
             }
             OnNewGameButtonClicked(null, new RoutedEventArgs());
         }
