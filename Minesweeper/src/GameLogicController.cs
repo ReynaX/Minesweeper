@@ -39,7 +39,7 @@ namespace Minesweeper
             }
         }
 
-        public LevelSettings.Difficulty Difficulty { get; private set; }
+        public LevelSettings.Difficulty Difficulty { get; set; }
 
         public bool IsGameLost { get; private set; }
         public bool IsGameWon { get; private set; }
